@@ -26,6 +26,7 @@ function varargout = plot_maker_VEMAP(varargin)
 %                   sample plot
 % 1.2   04/29/16    You can now save and load data that you have worked on.
 %                   Fixed minor bug with figure function.
+% 1.3   11/20/18    Added smoothing the comparison plots  
 
 % Edit the above text to modify the response to help plot_maker_VEMAP
 
@@ -453,11 +454,11 @@ elseif handles.plottype == 4
     
     [haxes1, hline1, hline2] = plotyy(t,mean_tmp,t,velocity_mean_tmp);
     set(hline1,'Color','green','LineWidth',2)
-    set(hline2,'Color','red','LineWidth',2)
+    set(hline2,'Color','red','LineWidth',4)
     
     
-    set(haxes1(1),'YColor','black','Ylim',[-5 5],'YTick',[-2 0 2])
-    set(haxes1(2),'YColor','black','Ylim',[-100 100],'YTick',[-40 0 40])
+    set(haxes1(1),'YColor','black','Ylim',[-6 2],'YTick',[-6 -4 -2 0]) %% CHANG EDIT
+    set(haxes1(2),'YColor','black','Ylim',[-26 8.7],'YTick',[-20 -10 0]) %% CHANG EDIT
     if settings.ensemble_plot.zero_plot == 1
         plot([0 T],[0 0],'-.k')
     end
@@ -1029,12 +1030,16 @@ elseif plottype == 3 % comparison_plot
     pos2 = data.movement2.v_data;
     
     for i = 1:length(pos1(:,1))
-        vel1(i,:) = PositionToVelocity(pos1(i,:));
+        %vel1(i,:) = PositionToVelocity(pos1(i,:));
+        tmp1 = PositionToVelocity(pos1(i,:));
+        vel1(i,:) = smooth(tmp1,smoothing);
     end
     
     
     for i = 1:length(pos2(:,1))
-        vel2(i,:) = PositionToVelocity(pos2(i,:));
+        %vel2(i,:) = PositionToVelocity(pos2(i,:));
+        tmp1 = PositionToVelocity(pos2(i,:));
+        vel2(i,:) = smooth(tmp1,smoothing);
     end
     
     for i = 1:length(vel1)
@@ -1048,14 +1053,18 @@ elseif plottype == 3 % comparison_plot
     
     
     for i = 1:length(pos1)
-        posmean1(i) = nanmean(pos1(:,i));
+        %posmean1(i) = nanmean(pos1(:,i));
+        tmp1(i)= nanmean(pos1(:,i));
+        
     end
-    
+        posmean1 = smooth(tmp1,smoothing);
     
     for i = 1:length(pos2)
-        posmean2(i) = nanmean(pos2(:,i));
+        %posmean2(i) = nanmean(pos2(:,i));
+        tmp1(i)= nanmean(pos2(:,i));
     end
-    
+        posmean2 = smooth(tmp1,smoothing);
+        
     [haxes1, hline1, hline2] = plotyy(t,velmean1,t,posmean1);
     [haxes2, hline3, hline4] = plotyy(t,velmean2,t,posmean2);
     plot([0 T],[0 0],'-.k')
@@ -1106,8 +1115,8 @@ elseif plottype == 4 % ensemble plot with velocity
     set(hline2,'Color','red','LineWidth',2)
     
     
-    set(haxes1(1),'YColor','black','Ylim',[-5 5],'YTick',[-2 0 2])
-    set(haxes1(2),'YColor','black','Ylim',[-100 100],'YTick',[-40 0 40])
+    set(haxes1(1),'YColor','black','Ylim',[-6 2],'YTick',[-6 -4 -2 0])  %%CHANG EDIT Con: [-2 6] [0 2 4 6]
+    set(haxes1(2),'YColor','black','Ylim',[-26 8.7],'YTick',[-20 -10 0]) %%CHANG EDIT Con: [-7.3 22] [0 10 20]
     if settings.ensemble_plot.zero_plot == 1
         plot([0 T],[0 0],'-.k')
     end
